@@ -17,7 +17,7 @@ def invite_collaborator(token, owner, repo, username, permission='push'):
     # Strip '@' if present and any whitespace
     username = username.strip().lstrip('@')
     if not username:
-        return False
+        return False, "Empty username"
 
     url = f'https://api.github.com/repos/{owner}/{repo}/collaborators/{username}'
 
@@ -33,16 +33,17 @@ def invite_collaborator(token, owner, repo, username, permission='push'):
         response = requests.put(url, headers=headers, json=payload)
         if response.status_code == 201:
             print(f"Success: Invitation sent to {username}.")
-            return True
+            return True, "Invitation sent"
         elif response.status_code == 204:
             print(f"Success: {username} is already a collaborator.")
-            return True
+            return True, "Already a collaborator"
         else:
-            print(f"Error {response.status_code} for {username}: {response.json().get('message')}")
-            return False, response.json().get('message')
+            message = response.json().get('message', 'Unknown error')
+            print(f"Error {response.status_code} for {username}: {message}")
+            return False, message
     except Exception as e:
         print(f"Exception for {username}: {e}")
-        return False
+        return False, str(e)
 
 def main():
     if not ADMIN_TOKEN:
