@@ -42,7 +42,7 @@ class GitHubInviter:
         except Exception as e:
             return False, str(e)
 
-    def run(self, max_invites=60, usernames_list=None):
+    def run(self, max_invites=60, usernames_list=None, delay=3):
         if not self.token:
             yield "Error: ADMIN_TOKEN not found."
             return
@@ -68,7 +68,7 @@ class GitHubInviter:
         failed_lines = []
         is_not_a_user = []
 
-        yield f"Starting invitations for {len(to_process)} users..."
+        yield f"Starting invitations for {len(to_process)} users (Delay: {delay}s)..."
 
         for idx, line in enumerate(to_process):
             username = line.strip()
@@ -90,7 +90,7 @@ class GitHubInviter:
                     yield f"{status_prefix} Error: {username} ({invite_message})"
             
             if idx < len(to_process) - 1:
-                time.sleep(3)
+                time.sleep(delay)
 
         # Append successful to success file
         if successful_usernames:

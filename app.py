@@ -17,6 +17,7 @@ def start_invites():
     tbi_file = data.get('tbi_file')
     success_file = data.get('success_file')
     max_invites = int(data.get('max_invites', 60))
+    delay = float(data.get('delay', 3))
     usernames_raw = data.get('usernames', '')
     usernames_list = usernames_raw.split('\n') if usernames_raw.strip() else None
 
@@ -29,7 +30,7 @@ def start_invites():
     )
 
     def generate():
-        for log in inviter.run(max_invites=max_invites, usernames_list=usernames_list):
+        for log in inviter.run(max_invites=max_invites, usernames_list=usernames_list, delay=delay):
             yield f"data: {json.dumps({'message': log})}\n\n"
 
     return Response(stream_with_context(generate()), mimetype='text/event-stream')
