@@ -140,10 +140,14 @@
                     <label for="usernames">Usernames to Invite <span class="placeholder">(one per line, overrides Input File)</span></label>
                     <textarea id="usernames" rows="4" placeholder="octocat&#10;monalisa"></textarea>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px;">
                     <div class="form-group">
                         <label for="max_invites">Max Invites</label>
                         <input type="number" id="max_invites" value="60">
+                    </div>
+                    <div class="form-group">
+                        <label for="delay">Delay (sec)</label>
+                        <input type="number" id="delay" value="3" step="0.5">
                     </div>
                     <div class="form-group">
                         <label for="tbi_file">Input File</label>
