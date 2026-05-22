@@ -11,6 +11,7 @@
 
 ## 🌟 Key Features
 
+- **Web UI:** Modern browser-based interface for configuration and real-time log monitoring.
 - **Bulk Invitation:** Process up to 60 users per run (batch-limited to stay within safe API limits).
 - **Smart Queue Management:** Automatically updates your invitation list, moving successful invites to a log and keeping failed ones for retries.
 - **Rate Limit Friendly:** Built-in delays (3 seconds between requests) to avoid triggering GitHub's secondary rate limits.
@@ -30,7 +31,7 @@ cd Invite-GitHub-Users
 ### 2. Install Dependencies
 Ensure you have Python 3.6+ installed. Install the required libraries using pip:
 ```bash
-pip install requests python-dotenv
+pip install requests python-dotenv flask
 ```
 
 ### 3. Configure Environment Variables
@@ -44,11 +45,29 @@ Edit `.env` and provide your `ADMIN_TOKEN`.
 
 ### 4. Prepare User Lists
 - Edit `to_be_invited.txt` and add the GitHub usernames you wish to invite (one per line).
-- You can use the format `@username` or just `username`.
+- Alternatively, you can paste them directly into the Web UI.
 
 ---
 
-## 🚀 Usage
+## 🌐 Web Interface (Recommended)
+
+The project now includes a modern web-based UI for easier management.
+
+### How to Start the Server
+```bash
+python app.py
+```
+Once started, open your browser and navigate to: **`http://127.0.0.1:5000`**
+
+### UI Features:
+- **Live Logs:** Real-time terminal output in the browser.
+- **Direct Entry:** Paste usernames directly into the UI (overrides file input).
+- **On-the-fly Config:** Change target repo, owner, or max invites without editing code.
+- **Smart Fallbacks:** Leave fields empty to use your `.env` or script defaults.
+
+---
+
+## 🚀 CLI Usage (Legacy)
 
 Simply run the script:
 ```bash

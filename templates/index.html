@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub User Inviter</title>
+    <style>
+        :root {
+            --primary-color: #2da44e;
+            --bg-color: #f6f8fa;
+            --card-bg: #ffffff;
+            --text-color: #24292f;
+            --border-color: #d0d7de;
+            --terminal-bg: #1c1c1c;
+            --terminal-text: #00ff00;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #0969da;
+            box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: 1px solid rgba(27, 31, 36, 0.15);
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #2c974b;
+        }
+
+        .btn:disabled {
+            background-color: #94d3a2;
+            cursor: not-allowed;
+        }
+
+        .terminal {
+            background-color: var(--terminal-bg);
+            color: var(--terminal-text);
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 12px;
+            padding: 16px;
+            border-radius: 6px;
+            height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 1px solid #333;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+        }
+
+        .placeholder {
+            color: #666;
+            font-style: italic;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🚀 GitHub User Inviter</h1>
+            <div id="config-form">
+                <div class="form-group">
+                    <label for="token">Admin Token <span class="placeholder">(leave empty to use .env)</span></label>
+                    <input type="password" id="token" placeholder="github_pat_...">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="owner">Owner <span class="placeholder">(default: ishandutta2007)</span></label>
+                        <input type="text" id="owner" placeholder="ishandutta2007">
+                    </div>
+                    <div class="form-group">
+                        <label for="repo">Repository <span class="placeholder">(default: Top-AI-repos)</span></label>
+                        <input type="text" id="repo" placeholder="Top-AI-repos">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="usernames">Usernames to Invite <span class="placeholder">(one per line, overrides Input File)</span></label>
+                    <textarea id="usernames" rows="4" placeholder="octocat&#10;monalisa"></textarea>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="max_invites">Max Invites</label>
+                        <input type="number" id="max_invites" value="60">
+                    </div>
+                    <div class="form-group">
+                        <label for="tbi_file">Input File</label>
+                        <input type="text" id="tbi_file" placeholder="to_be_invited.txt">
+                    </div>
+                    <div class="form-group">
+                        <label for="success_file">Success Log</label>
+                        <input type="text" id="success_file" placeholder="successful_invites.txt">
+                    </div>
+                </div>
+                <button id="start-btn" class="btn">Start Invitations</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <label>Progress Log</label>
+            <div id="terminal" class="terminal">Ready...</div>
+        </div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('start-btn');
+        const terminal = document.getElementById('terminal');
+
+        startBtn.addEventListener('click', async () => {
+            const config = {
+                token: document.getElementById('token').value,
+                owner: document.getElementById('owner').value,
+                repo: document.getElementById('repo').value,
+                max_invites: document.getElementById('max_invites').value,
+                tbi_file: document.getElementById('tbi_file').value,
+                success_file: document.getElementById('success_file').value,
+                usernames: document.getElementById('usernames').value
+            };
+
+            terminal.innerHTML = '';
+            startBtn.disabled = true;
+
+            try {
+                const response = await fetch('/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.substring(6));
+                                appendLog(data.message);
+                            } catch (e) {
+                                console.error('Error parsing JSON:', e);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                appendLog('Error: ' + error.message);
+            } finally {
+                startBtn.disabled = false;
+            }
+        });
+
+        function appendLog(message) {
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.textContent = '> ' + message;
+            terminal.appendChild(div);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+    </script>
+</body>
+</html>
