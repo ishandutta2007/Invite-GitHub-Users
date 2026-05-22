@@ -39,7 +39,7 @@ def invite_collaborator(token, owner, repo, username, permission='push'):
             return True
         else:
             print(f"Error {response.status_code} for {username}: {response.json().get('message')}")
-            return False
+            return False, response.json().get('message')
     except Exception as e:
         print(f"Exception for {username}: {e}")
         return False
@@ -65,16 +65,21 @@ def main():
     
     successful_usernames = []
     failed_lines = []
+    is_not_a_user = []
 
     for idx, line in enumerate(to_process):
         username = line.strip()
         if not username:
             continue
         print(f"[{idx+1}/{len(to_process)}]")
-        if invite_collaborator(ADMIN_TOKEN, OWNER, REPO, username):
+        is_invited_success, invite_message = invite_collaborator(ADMIN_TOKEN, OWNER, REPO, username)
+        if is_invited_success:
             successful_usernames.append(line)
         else:
-            failed_lines.append(line)
+            if invite_message and "is not a user" in invite_message:
+                is_not_a_user.append(line)
+            else:
+                failed_lines.append(line)
         time.sleep(3)
 
     # Append successful to success file
@@ -87,7 +92,7 @@ def main():
     with open(TBI_FILE, 'w') as f:
         f.writelines(new_tbi_content)
 
-    print(f"Processed {len(to_process)} users. {len(successful_usernames)} successful, {len(failed_lines)} failed.")
+    print(f"Processed {len(to_process)} users. {len(successful_usernames)} successful, {len(is_not_a_user)} not a user, {len(failed_lines)} other failure.")
 
 if __name__ == "__main__":
     main()
