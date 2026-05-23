@@ -1,6 +1,7 @@
 import os
 import time
 import requests
+import argparse
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -112,8 +113,26 @@ class GitHubInviter:
         yield f"Other failures: {len(failed_lines)}"
 
 def main():
-    inviter = GitHubInviter()
-    for log in inviter.run():
+    parser = argparse.ArgumentParser(description='InvitePilot: Bulk invite users to a GitHub repository.')
+    parser.add_argument('--token', type=str, help='GitHub Admin Token (overrides .env)')
+    parser.add_argument('--owner', type=str, help='GitHub Repository Owner')
+    parser.add_argument('--repo', type=str, help='GitHub Repository Name')
+    parser.add_argument('--max-invites', type=int, default=60, help='Maximum number of invites to send in this run')
+    parser.add_argument('--delay', type=float, default=3.0, help='Delay in seconds between invites')
+    parser.add_argument('--input', type=str, help='Path to the input file with usernames')
+    parser.add_argument('--success-log', type=str, help='Path to the success log file')
+
+    args = parser.parse_args()
+
+    inviter = GitHubInviter(
+        token=args.token,
+        owner=args.owner,
+        repo=args.repo,
+        tbi_file=args.input,
+        success_file=args.success_log
+    )
+
+    for log in inviter.run(max_invites=args.max_invites, delay=args.delay):
         print(log)
 
 if __name__ == "__main__":

@@ -82,11 +82,21 @@ Add your **GitHub Personal Access Token** to `ADMIN_TOKEN`.
 Launch `app.py`, paste your list of usernames, and hit **Initialize Automation**.
 
 ### Method B: The CLI Power-User
-1. Populate `to_be_invited.txt` with usernames.
-2. Run the script:
-   ```bash
-   python invite.py
-   ```
+Populate `to_be_invited.txt` with usernames and run the script. You can use optional arguments to override settings:
+```bash
+python invite.py --delay 5.0 --max-invites 100 --repo My-Awesome-Repo
+```
+
+#### Available CLI Arguments:
+| Argument | Description |
+| :--- | :--- |
+| `--token` | GitHub Admin Token (overrides .env) |
+| `--owner` | GitHub Repository Owner |
+| `--repo` | GitHub Repository Name |
+| `--max-invites`| Maximum number of invites to send (default: 60) |
+| `--delay` | Delay in seconds between invites (default: 3.0) |
+| `--input` | Path to input file (default: to_be_invited.txt) |
+| `--success-log`| Path to success log (default: successful_invites.txt) |
 
 ---
 
