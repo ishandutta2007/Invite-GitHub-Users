@@ -3,6 +3,7 @@ import time
 import requests
 import argparse
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Load environment variables from .env file
 load_dotenv()
@@ -12,8 +13,8 @@ class GitHubInviter:
         self.token = token or os.getenv("ADMIN_TOKEN")
         self.owner = owner or 'ishandutta2007'
         self.repo = repo or 'Top-AI-repos'
-        self.tbi_file = tbi_file or 'to_be_invited.txt'
-        self.success_file = success_file or 'successful_invites.txt'
+        self.tbi_file = tbi_file or Path(__file__).parent / 'to_be_invited.txt'
+        self.success_file = success_file or Path(__file__).parent / 'successful_invites.txt'
 
     def invite_collaborator(self, username, permission='push'):
         # Strip '@' if present and any whitespace
